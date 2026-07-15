@@ -1,0 +1,47 @@
+name: Trivia System App CI/CD
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  IMAGE: ghcr.io/sambadi-125/trivia-quiz-system-app
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  ci-cd-job:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build and test with Maven
+        run: mvn -B verify -DskipITs
+
+      - name: Log in to ghcr.io
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push Docker image
+        if: github.event_name == 'push'
+        run: |
+          TAG=latest
+          docker build -t ${{ env.IMAGE }}:$TAG -t ${{ env.IMAGE }}:${{ github.sha }} .
+          docker push ${{ env.IMAGE }}:$TAG
+          docker push ${{ env.IMAGE }}:${{ github.sha }}
