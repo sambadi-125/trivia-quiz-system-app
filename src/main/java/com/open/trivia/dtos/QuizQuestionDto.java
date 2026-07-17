@@ -1,4 +1,4 @@
-package com.open.trivia.service.dto;
+package com.open.trivia.dtos;
 
 import com.open.trivia.service.feign.response.TriviaApiResponseItem;
 import org.apache.commons.collections4.ListUtils;

@@ -1,7 +1,6 @@
 package com.open.trivia;
 
-import com.open.trivia.service.dto.QuizQuestionDto;
-import com.open.trivia.service.feign.response.TriviaApiResponseItem;
+import com.open.trivia.dtos.QuizQuestionDto;
 import com.open.trivia.service.TriviaQuizService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
