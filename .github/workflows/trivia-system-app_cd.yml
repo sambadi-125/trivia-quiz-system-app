@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   ci-cd-job:
-    name: Build & Test
+    name: Build & Test & Containerize
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -27,8 +27,8 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Build and test with Maven
-        run: mvn -B verify -DskipITs
+      - name: Build and Test
+        run: mvn -B verify
 
       - name: Log in to ghcr.io
         if: github.event_name == 'push'
@@ -38,7 +38,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push Docker image
+      - name: Create Docker Image
         if: github.event_name == 'push'
         run: |
           TAG=latest
