@@ -1,5 +1,6 @@
 package com.open.trivia.service;
 
+import com.open.trivia.dtos.PlayerAnswerValidationResponse;
 import com.open.trivia.dtos.QuizQuestionDto;
 import com.open.trivia.service.feign.TriviaApiFeignClient;
 import org.junit.jupiter.api.BeforeAll;
@@ -53,10 +54,10 @@ class TriviaQuizServiceTest {
         when(triviaApiFeignClient.getQuizQuestions()).thenReturn(TRIVIA_API_RESPONSE);
 
         triviaQuizService.fetchQuizQuestions();
-        Map<Integer, Boolean> expected = Map.ofEntries(
-                entry(0, true),
-                entry(1, true),
-                entry(2, false)
+        List<PlayerAnswerValidationResponse> expected = List.of(
+                new PlayerAnswerValidationResponse(0, true),
+                new PlayerAnswerValidationResponse(1, true),
+                new PlayerAnswerValidationResponse(2, false)
         );
         var result = triviaQuizService.checkAnswers(QUIZ_ANSWERS);
 
