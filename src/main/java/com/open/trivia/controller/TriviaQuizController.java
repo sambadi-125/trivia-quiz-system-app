@@ -5,10 +5,7 @@ import com.open.trivia.dtos.PlayerAnswerValidationResponse;
 import com.open.trivia.dtos.QuizQuestionDto;
 import com.open.trivia.service.TriviaQuizService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,7 +25,8 @@ public class TriviaQuizController {
     }
 
     @PostMapping("/checkanswers")
-    public ResponseEntity<List<PlayerAnswerValidationResponse>> validatePlayerAnswers(List<PlayerAnswerDto> playerAnswers) {
+    public ResponseEntity<List<PlayerAnswerValidationResponse>> validatePlayerAnswers(
+            @RequestBody List<PlayerAnswerDto> playerAnswers) {
         return ResponseEntity.ok(triviaQuizService.checkAnswers(playerAnswers));
     }
 }
