@@ -1,5 +1,7 @@
 package com.open.trivia;
 
+import com.open.trivia.dtos.PlayerAnswerDto;
+import com.open.trivia.dtos.PlayerAnswerValidationResponse;
 import com.open.trivia.dtos.QuizQuestionDto;
 import com.open.trivia.service.TriviaQuizService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 import java.util.List;
-import java.util.Map;
 
 @SpringBootApplication
 @EnableFeignClients
@@ -26,12 +27,12 @@ public class TriviaApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
         List<QuizQuestionDto> quizQuestions = triviaQuizService.fetchQuizQuestions();
         quizQuestions.forEach(System.out::println);
-        Map<Integer, Boolean> integerBooleanMap = triviaQuizService.checkAnswers(Map.of(
-                0, "False",
-                1, "True",
-                2, "False",
-                3, "False"
+        List<PlayerAnswerValidationResponse> playerAnswerValidationResponses = triviaQuizService.checkAnswers(List.of(
+                new PlayerAnswerDto(0, "False"),
+                new PlayerAnswerDto(1, "True"),
+                new PlayerAnswerDto(2, "False"),
+                new PlayerAnswerDto(3, "False")
         ));
-        System.out.println(integerBooleanMap);
+        System.out.println(playerAnswerValidationResponses);
     }
 }

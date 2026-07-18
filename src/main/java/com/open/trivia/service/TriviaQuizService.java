@@ -1,5 +1,7 @@
 package com.open.trivia.service;
 
+import com.open.trivia.dtos.PlayerAnswerDto;
+import com.open.trivia.dtos.PlayerAnswerValidationResponse;
 import com.open.trivia.dtos.QuizQuestionDto;
 import com.open.trivia.service.feign.TriviaApiFeignClient;
 import com.open.trivia.service.feign.response.TriviaApiResponseItem;
@@ -59,15 +61,12 @@ public class TriviaQuizService {
                 );
     }
 
-    public Map<Integer, Boolean> checkAnswers(Map<Integer, String> answers) {
-        return answers.entrySet().stream()
-                .collect(Collectors.toMap(
-                                Map.Entry::getKey,
-                                entry -> compareTwoStrings(
-                                        entry.getValue(),
-                                        CORRECT_ANSWERS_MAP.get(entry.getKey())
-                                )
-                        )
-                );
+    public List<PlayerAnswerValidationResponse> checkAnswers(List<PlayerAnswerDto> playerAnswers) {
+        return playerAnswers.stream()
+                .map(playerAnswer -> new PlayerAnswerValidationResponse(
+                        playerAnswer.questionId(),
+                        compareTwoStrings(playerAnswer.playerAnswer(), CORRECT_ANSWERS_MAP.get(playerAnswer.questionId()))
+                ))
+                .toList();
     }
 }
