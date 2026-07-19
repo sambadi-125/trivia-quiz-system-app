@@ -1,6 +1,7 @@
 package com.open.trivia;
 
 import com.open.trivia.dtos.PlayerAnswerDto;
+import com.open.trivia.dtos.PlayerAnswerValidationResponse;
 import com.open.trivia.dtos.QuizQuestionDto;
 import com.open.trivia.service.feign.response.TriviaApiResponse;
 import com.open.trivia.service.feign.response.TriviaApiResponseItem;
@@ -60,6 +61,24 @@ public class TestFixtures {
                     "General Knowledge",
                     "Which American manufactured submachine gun was informally known by the American soldiers that used it as \"Grease Gun\"?",
                     List.of("Colt 9mm", "Thompson", "MAC-10", "M3")
+            )
+    ));
+
+    public static List<PlayerAnswerValidationResponse> PLAYER_ANSWERS_VALIDATION_RESPONSES = new ArrayList<>(List.of(
+            new PlayerAnswerValidationResponse(
+                    0,
+                    "House Majority Whip",
+                    true
+            ),
+            new PlayerAnswerValidationResponse(
+                    1,
+                    "Toy Story 2",
+                    true
+            ),
+            new PlayerAnswerValidationResponse(
+                    2,
+                    "M3",
+                    false
             )
     ));
 }
