@@ -13,7 +13,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.open.trivia.utils.DataComparisonUtilities.compareTwoStrings;
+import static com.open.trivia.utils.DataOptimizationUtilities.compareTwoStrings;
+import static com.open.trivia.utils.DataOptimizationUtilities.removeHtmlSymbols;
 
 @Service
 public class TriviaQuizService {
@@ -30,10 +31,6 @@ public class TriviaQuizService {
         var triviaApiResponseItems = triviaApiFeignClient.getQuizQuestions().results();
         loadQuizQuestionsDtoMap(triviaApiResponseItems);
         loadCorrectAnswersMap(triviaApiResponseItems);
-
-        //TODO remove: start of temporal part for logging:
-        QUIZ_QUESTIONS_DTO_MAP.forEach((x, y) -> System.out.println("key: " + x + "; value: " + y));
-        // end of temporal part for logging:
 
         return QUIZ_QUESTIONS_DTO_MAP.entrySet().stream()
                 .map(triviaApiResponseMap -> QuizQuestionDto.fromTriviaApiResponse(
@@ -65,7 +62,11 @@ public class TriviaQuizService {
         return playerAnswers.stream()
                 .map(playerAnswer -> new PlayerAnswerValidationResponse(
                         playerAnswer.questionId(),
-                        compareTwoStrings(playerAnswer.playerAnswer(), CORRECT_ANSWERS_MAP.get(playerAnswer.questionId()))
+                        removeHtmlSymbols(CORRECT_ANSWERS_MAP.get(playerAnswer.questionId())),
+                        compareTwoStrings(
+                                playerAnswer.playerAnswer(),
+                                CORRECT_ANSWERS_MAP.get(playerAnswer.questionId())
+                        )
                 ))
                 .toList();
     }

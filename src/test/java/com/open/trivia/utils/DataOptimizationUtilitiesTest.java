@@ -7,10 +7,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static com.open.trivia.utils.DataComparisonUtilities.compareTwoStrings;
+import static com.open.trivia.utils.DataOptimizationUtilities.compareTwoStrings;
+import static com.open.trivia.utils.DataOptimizationUtilities.removeHtmlSymbols;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DataComparisonUtilitiesTest {
+class DataOptimizationUtilitiesTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideValuesToCompare")
@@ -27,5 +28,13 @@ class DataComparisonUtilitiesTest {
                 Arguments.of("Excessive symbol", "one", "ONE-", false),
                 Arguments.of("Unequal words", "one", "two", false)
         );
+    }
+
+    @Test
+    void removeHtmlSymbols_whenStringWithHtmlSymbolsProvided_thenReturnsSanitizedResult() {
+        var textWithHtmlSymbols = "Who created the Cartoon Network series &quot;Regular Show&quot;?";
+        var expected = "Who created the Cartoon Network series \"Regular Show\"?";
+
+        assertThat(removeHtmlSymbols(textWithHtmlSymbols)).isEqualTo(expected);
     }
 }

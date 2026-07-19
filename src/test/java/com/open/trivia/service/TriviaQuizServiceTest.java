@@ -55,9 +55,9 @@ class TriviaQuizServiceTest {
 
         triviaQuizService.fetchQuizQuestions();
         List<PlayerAnswerValidationResponse> expected = List.of(
-                new PlayerAnswerValidationResponse(0, true),
-                new PlayerAnswerValidationResponse(1, true),
-                new PlayerAnswerValidationResponse(2, false)
+                new PlayerAnswerValidationResponse(0, "House Majority Whip", true),
+                new PlayerAnswerValidationResponse(1, "Toy Story 2", true),
+                new PlayerAnswerValidationResponse(2, "M3",false)
         );
         var result = triviaQuizService.checkAnswers(QUIZ_ANSWERS);
 
