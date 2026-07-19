@@ -5,6 +5,7 @@ import com.open.trivia.dtos.PlayerAnswerValidationResponse;
 import com.open.trivia.dtos.QuizQuestionDto;
 import com.open.trivia.service.feign.TriviaApiFeignClient;
 import com.open.trivia.service.feign.response.TriviaApiResponseItem;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import static com.open.trivia.utils.DataOptimizationUtilities.compareTwoStrings;
 import static com.open.trivia.utils.DataOptimizationUtilities.removeHtmlSymbols;
 
 @Service
+@Slf4j
 public class TriviaQuizService {
     private final TriviaApiFeignClient triviaApiFeignClient;
 
@@ -27,10 +29,31 @@ public class TriviaQuizService {
     private static Map<Integer, TriviaApiResponseItem> QUIZ_QUESTIONS_DTO_MAP = new HashMap<>();
     private static Map<Integer, String> CORRECT_ANSWERS_MAP = new HashMap<>();
 
+    public List<PlayerAnswerValidationResponse> checkAnswers(List<PlayerAnswerDto> playerAnswers) {
+        log.info("CHECKING PLAYER QUIZ ANSWERS");
+        return playerAnswers.stream()
+                .map(playerAnswer -> new PlayerAnswerValidationResponse(
+                        playerAnswer.questionId(),
+                        removeHtmlSymbols(CORRECT_ANSWERS_MAP.get(playerAnswer.questionId())),
+                        compareTwoStrings(
+                                playerAnswer.playerAnswer(),
+                                CORRECT_ANSWERS_MAP.get(playerAnswer.questionId())
+                        )
+                ))
+                .peek(validationResponse -> log.debug("Validation response: {}", validationResponse))
+                .toList();
+    }
+
     public List<QuizQuestionDto> fetchQuizQuestions() {
-        var triviaApiResponseItems = triviaApiFeignClient.getQuizQuestions().results();
-        loadQuizQuestionsDtoMap(triviaApiResponseItems);
-        loadCorrectAnswersMap(triviaApiResponseItems);
+        log.info("[START] FETCHING QUIZ QUESTIONS");
+        try {
+            var triviaApiResponseItems = triviaApiFeignClient.getQuizQuestions().results();
+            loadQuizQuestionsDtoMap(triviaApiResponseItems);
+            loadCorrectAnswersMap(triviaApiResponseItems);
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching quiz questions. {}", e.getMessage());
+        }
+        log.info("[END] QUIZ QUESTIONS FETCHED");
 
         return QUIZ_QUESTIONS_DTO_MAP.entrySet().stream()
                 .map(triviaApiResponseMap -> QuizQuestionDto.fromTriviaApiResponse(
@@ -39,7 +62,6 @@ public class TriviaQuizService {
                 )
                 .toList();
     }
-
 
     private void loadQuizQuestionsDtoMap(List<TriviaApiResponseItem> triviaApiResponseItems) {
         QUIZ_QUESTIONS_DTO_MAP = IntStream
@@ -56,18 +78,5 @@ public class TriviaQuizService {
                         questionId -> questionId,
                         questionId -> triviaApiResponseItems.get(questionId).correct_answer())
                 );
-    }
-
-    public List<PlayerAnswerValidationResponse> checkAnswers(List<PlayerAnswerDto> playerAnswers) {
-        return playerAnswers.stream()
-                .map(playerAnswer -> new PlayerAnswerValidationResponse(
-                        playerAnswer.questionId(),
-                        removeHtmlSymbols(CORRECT_ANSWERS_MAP.get(playerAnswer.questionId())),
-                        compareTwoStrings(
-                                playerAnswer.playerAnswer(),
-                                CORRECT_ANSWERS_MAP.get(playerAnswer.questionId())
-                        )
-                ))
-                .toList();
     }
 }
