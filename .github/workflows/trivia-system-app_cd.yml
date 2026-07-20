@@ -4,6 +4,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 env:
   IMAGE: ghcr.io/sambadi-125/trivia-quiz-system-app
@@ -31,7 +32,7 @@ jobs:
         run: mvn -B verify
 
       - name: Log in to ghcr.io
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -39,9 +40,25 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Docker Image
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
           TAG=latest
           docker build -t ${{ env.IMAGE }}:$TAG -t ${{ env.IMAGE }}:${{ github.sha }} .
           docker push ${{ env.IMAGE }}:$TAG
           docker push ${{ env.IMAGE }}:${{ github.sha }}
+
+  deploy-dev:
+    name: Deploy to DEV
+    needs: ci-cd-job
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to dev namespace
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: magomed
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            sudo kubectl set image deployment/trivia-quiz-system-app trivia-quiz-system-app=ghcr.io/sambadi-125/trivia-quiz-system-app:${{ github.sha }} -n dev
+            sudo kubectl rollout status deployment/trivia-quiz-system-app -n dev --timeout=120s
