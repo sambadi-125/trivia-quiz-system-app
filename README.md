@@ -12,8 +12,7 @@ Follow these steps to be able to run application locally:
 3. Run `TriviaApplication.class` using `localhost`-profile
 
 ### Server
-
-[//]: # TODO: Add link to the instance running on a serven when known
+The app is also deployed on a cloud server which can be consulted following this [trivia-quiz-url](http://89.167.103.66/trivia/).
 
 ## Architecture
 *Install `Mermaid`-plugin to view graph(s) properly.*
@@ -40,14 +39,14 @@ sequenceDiagram
     participant TriviaApiFeignClient as TriviaApiFeignClient
 
     QUIZ PLAYER->>TriviaQuizController: getQuestions()
-    TriviaQuizController->>TriviaQuizService: fetchQuizQuestions()
+    TriviaQuizController->>TriviaQuizService: fetchNewQuiz()
     Note right of QUIZ PLAYER: Uses WebConfig for CORS-configuration
     TriviaQuizService->>TriviaApiFeignClient: getQuizQuestions()
     Note right of TriviaQuizService: Uses FeignConfig for FeignException decoding and Retryer configuration
     TriviaApiFeignClient-->>TriviaQuizService: TriviaApiResponse
-    TriviaQuizService-->>TriviaQuizController: List<QuizQuestionDto>
+    TriviaQuizService-->>TriviaQuizController: QuizDto
     Note right of TriviaQuizController: Uses DataOptimizationUtilities for response sanitization
-    TriviaQuizController-->>QUIZ PLAYER: 200 OK (QuizQuestions)
+    TriviaQuizController-->>QUIZ PLAYER: 200 OK (QuizDto)
 ```
 
 #### CheckAnswers - process
@@ -57,10 +56,11 @@ sequenceDiagram
     participant TriviaQuizController as TriviaQuizController(REST)
     participant TriviaQuizService as TriviaQuizService
 
-    QUIZ PLAYER->>TriviaQuizController: validatePlayerAnswers(List<PlayerAnswer>)
-    TriviaQuizController->>TriviaQuizService: checkAnswers(List<PlayerAnswers>)
+    QUIZ PLAYER->>TriviaQuizController: validatePlayerAnswers(PlayerAnswerDto)
+    TriviaQuizController->>TriviaQuizService: checkAnswers(PlayerAnswerDto)
     Note right of QUIZ PLAYER: Uses WebConfig for CORS-configuration
     TriviaQuizService-->>TriviaQuizController: List<PlayerAnswerValidationResponse>
     Note right of TriviaQuizController: Uses DataOptimizationUtilities for response sanitization and response validation
+    Note right of TriviaQuizController: Uses QuizIdGenerator for generating UUID as a unique identifier of each new quiz.
     TriviaQuizController-->>QUIZ PLAYER: 200 OK (List<PlayerAnswerValidationResponse>)
 ```

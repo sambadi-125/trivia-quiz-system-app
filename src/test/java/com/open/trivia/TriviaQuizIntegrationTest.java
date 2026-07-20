@@ -2,7 +2,6 @@ package com.open.trivia;
 
 import com.open.trivia.dtos.PlayerAnswerDto;
 import com.open.trivia.service.feign.TriviaApiFeignClient;
-import com.open.trivia.service.feign.response.TriviaApiResponseItem;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,8 +11,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import tools.jackson.databind.ObjectMapper;
-
-import java.util.List;
 
 import static com.open.trivia.TestFixtures.*;
 import static org.hamcrest.Matchers.hasSize;
@@ -50,9 +47,6 @@ public class TriviaQuizIntegrationTest {
     @Test
     void validatePlayerAnswers_whenRequested_thenValidatesPlayerResponses() throws Exception {
         when(triviaApiFeignClient.getQuizQuestions()).thenReturn(TRIVIA_API_RESPONSE);
-        List<String> correctAnswers = TRIVIA_API_RESPONSE.results().stream()
-                .map(TriviaApiResponseItem::correct_answer)
-                .toList();
 
         String responseBody = mvc.perform(get("/api/questions")
                         .contentType(MediaType.APPLICATION_JSON))

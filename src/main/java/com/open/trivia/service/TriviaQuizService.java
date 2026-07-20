@@ -24,7 +24,7 @@ public class TriviaQuizService {
         this.triviaApiFeignClient = triviaApiFeignClient;
     }
 
-    private static Map<String, List<QuizUnitItem>> QUIZ_UNITS_MAP = new HashMap<>();
+    private static final Map<String, List<QuizUnitItem>> QUIZ_UNITS_MAP = new HashMap<>();
 
     public List<PlayerAnswerValidationResponse> checkAnswers(PlayerAnswerDto playerAnswerDto) {
         log.info("CHECKING PLAYER QUIZ ANSWERS");

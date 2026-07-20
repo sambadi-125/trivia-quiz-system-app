@@ -7,8 +7,6 @@ import com.open.trivia.service.feign.response.TriviaApiResponseItem;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.open.trivia.utils.QuizIdGenerator.generateQuizId;
-
 public class TestFixtures {
 
     public static String QUIZ_ID = "TEST_QUIZ_ID";
