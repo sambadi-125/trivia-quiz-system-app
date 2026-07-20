@@ -48,7 +48,7 @@ public class TriviaQuizService {
         String quizId = "";
         try {
             var triviaApiResponseItems = triviaApiFeignClient.getQuizQuestions().results();
-            quizId = addQuizToQuizUnits(triviaApiResponseItems);
+            quizId = createQuiz(triviaApiResponseItems);
         } catch (Exception e) {
             log.error("Unexpected error while fetching quiz questions. {}", e.getMessage());
         }
@@ -62,7 +62,7 @@ public class TriviaQuizService {
                         .toList());
     }
 
-    private String addQuizToQuizUnits(List<TriviaApiResponseItem> triviaApiResponseItems) {
+    private String createQuiz(List<TriviaApiResponseItem> triviaApiResponseItems) {
         List<QuizUnitItem> quizUnitItems = IntStream
                 .range(0, triviaApiResponseItems.size())
                 .boxed()
