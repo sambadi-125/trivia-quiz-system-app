@@ -1,7 +1,8 @@
 package com.open.trivia.service;
 
+import com.open.trivia.dtos.PlayerAnswerDto;
 import com.open.trivia.dtos.PlayerAnswerValidationResponse;
-import com.open.trivia.dtos.QuizQuestionDto;
+import com.open.trivia.dtos.QuizDto;
 import com.open.trivia.service.feign.TriviaApiFeignClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,8 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static com.open.trivia.TestFixtures.QUIZ_ANSWERS;
-import static com.open.trivia.TestFixtures.TRIVIA_API_RESPONSE;
+import static com.open.trivia.TestFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -26,12 +26,12 @@ class TriviaQuizServiceTest {
     private TriviaQuizService triviaQuizService;
 
     @Test
-    void fetchQuizQuestions_whenCalled_thenReturnsQuizQuestionDtoList() {
+    void fetchQuizQuestions_whenCalled_thenReturnsNewQuizQuestionDtoList() {
         when(triviaApiFeignClient.getQuizQuestions()).thenReturn(TRIVIA_API_RESPONSE);
 
-        List<QuizQuestionDto> quizQuestionDtos = triviaQuizService.fetchQuizQuestions();
+        QuizDto newQuiz = triviaQuizService.fetchNewQuiz();
 
-        assertThat(quizQuestionDtos)
+        assertThat(newQuiz.quizQuestions())
                 .hasSize(3)
                 .first()
                 .satisfies(quizQuestionDto -> {
@@ -45,13 +45,19 @@ class TriviaQuizServiceTest {
     void checkAnswers_whenCalled_thenReturnComparisonResults() {
         when(triviaApiFeignClient.getQuizQuestions()).thenReturn(TRIVIA_API_RESPONSE);
 
-        triviaQuizService.fetchQuizQuestions();
+        QuizDto quiz = triviaQuizService.fetchNewQuiz();
+        String quizId = quiz.quizId();
+        PlayerAnswerDto playerAnswer = new PlayerAnswerDto(
+                quizId,
+                PLAYER_ANSWERS
+        );
+
         List<PlayerAnswerValidationResponse> expected = List.of(
                 new PlayerAnswerValidationResponse(0, "House Majority Whip", true),
                 new PlayerAnswerValidationResponse(1, "Toy Story 2", true),
-                new PlayerAnswerValidationResponse(2, "M3",false)
+                new PlayerAnswerValidationResponse(2, "M3", false)
         );
-        var result = triviaQuizService.checkAnswers(QUIZ_ANSWERS);
+        var result = triviaQuizService.checkAnswers(playerAnswer);
 
         assertThat(result).isEqualTo(expected);
     }

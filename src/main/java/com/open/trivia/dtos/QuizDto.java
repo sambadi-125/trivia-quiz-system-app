@@ -2,8 +2,8 @@ package com.open.trivia.dtos;
 
 import java.util.List;
 
-public record PlayerAnswerDto(
+public record QuizDto(
         String quizId,
-        List<PlayerAnswerItem> playerAnswers
+        List<QuizQuestionDto> quizQuestions
 ) {
 }

@@ -1,5 +1,6 @@
 package com.open.trivia;
 
+import com.open.trivia.dtos.PlayerAnswerDto;
 import com.open.trivia.service.feign.TriviaApiFeignClient;
 import com.open.trivia.service.feign.response.TriviaApiResponseItem;
 import org.junit.jupiter.api.Test;
@@ -42,8 +43,8 @@ public class TriviaQuizIntegrationTest {
         mvc.perform(get("/api/questions")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[0].category", is(QUIZ_QUESTION_DTOS.get(0).category())));
+                .andExpect(jsonPath("$.quizQuestions", hasSize(3)))
+                .andExpect(jsonPath("$.quizQuestions[0].category", is(QUIZ_QUESTION_DTOS.get(0).category())));
     }
 
     @Test
@@ -53,15 +54,24 @@ public class TriviaQuizIntegrationTest {
                 .map(TriviaApiResponseItem::correct_answer)
                 .toList();
 
-        mvc.perform(get("/api/questions").contentType(MediaType.APPLICATION_JSON));
+        String responseBody = mvc.perform(get("/api/questions")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        String quizId = objectMapper.readTree(responseBody).get("quizId").asText();
+
+        PlayerAnswerDto playerAnswer = new PlayerAnswerDto(quizId, PLAYER_ANSWERS);
+
         mvc.perform(MockMvcRequestBuilders
                         .post("/api/checkanswers")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(QUIZ_ANSWERS))
+                        .content(objectMapper.writeValueAsString(playerAnswer))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[0].questionId", is(QUIZ_ANSWERS.get(0).questionId())))
+                .andExpect(jsonPath("$[0].questionId", is(playerAnswer.playerAnswers().get(0).questionId())))
                 .andExpect(jsonPath("$[0].correctAnswer", is(PLAYER_ANSWERS_VALIDATION_RESPONSES.get(0).correctAnswer())))
                 .andExpect(jsonPath("$[0].isPlayerAnswerCorrect", is(PLAYER_ANSWERS_VALIDATION_RESPONSES.get(0).isPlayerAnswerCorrect())));
     }

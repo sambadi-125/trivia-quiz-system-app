@@ -1,12 +1,9 @@
 package com.open.trivia.dtos;
 
-import com.open.trivia.service.feign.response.TriviaApiResponseItem;
-import com.open.trivia.utils.DataOptimizationUtilities;
+import com.open.trivia.model.QuizUnitItem;
 import org.apache.commons.collections4.ListUtils;
 
 import java.util.List;
-
-import static com.open.trivia.utils.DataOptimizationUtilities.removeHtmlSymbols;
 
 public record QuizQuestionDto(
         int id,
@@ -16,22 +13,20 @@ public record QuizQuestionDto(
         List<String> answerChoices
 ) {
 
-    public static QuizQuestionDto fromTriviaApiResponse(TriviaApiResponseItem triviaApiResponseItem, int id) {
+    public static QuizQuestionDto fromQuizUnitItem(QuizUnitItem quizUnitItem) {
         return new QuizQuestionDto(
-                id,
-                removeHtmlSymbols(triviaApiResponseItem.type()),
-                removeHtmlSymbols(triviaApiResponseItem.category()),
-                removeHtmlSymbols(triviaApiResponseItem.question()),
-                extractAnswerChoices(triviaApiResponseItem).stream()
-                        .map(DataOptimizationUtilities::removeHtmlSymbols)
-                        .toList()
+                quizUnitItem.quizQuestionId(),
+                quizUnitItem.type(),
+                quizUnitItem.category(),
+                quizUnitItem.question(),
+                extractAnswerChoices(quizUnitItem)
         );
     }
 
-    private static List<String> extractAnswerChoices(TriviaApiResponseItem triviaApiResponseItem) {
+    private static List<String> extractAnswerChoices(QuizUnitItem quizUnitItem) {
         return ListUtils.union(
-                triviaApiResponseItem.incorrect_answers(),
-                List.of(triviaApiResponseItem.correct_answer())
+                quizUnitItem.incorrect_answers(),
+                List.of(quizUnitItem.correct_answer())
         );
     }
 }
