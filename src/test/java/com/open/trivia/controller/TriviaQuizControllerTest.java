@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
+import static com.open.trivia.TestFixtures.QUIZ;
 import static com.open.trivia.TestFixtures.QUIZ_QUESTION_DTOS;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -31,12 +32,12 @@ class TriviaQuizControllerTest {
 
     @Test
     void getQuestions_whenCalled_thenReturnListOfQuestions() throws Exception {
-        when(triviaQuizService.fetchQuizQuestions()).thenReturn(QUIZ_QUESTION_DTOS);
+        when(triviaQuizService.fetchNewQuiz()).thenReturn(QUIZ);
 
         mvc.perform(get("/api/questions")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect((ResultMatcher) jsonPath("$[0].category", is(QUIZ_QUESTION_DTOS.get(0).category())));
+                .andExpect(jsonPath("$.quizQuestions", hasSize(3)))
+                .andExpect((ResultMatcher) jsonPath("$.quizQuestions[0].category", is(QUIZ_QUESTION_DTOS.get(0).category())));
     }
 }

@@ -1,19 +1,16 @@
 package com.open.trivia;
 
-import com.open.trivia.dtos.PlayerAnswerDto;
-import com.open.trivia.dtos.PlayerAnswerValidationResponse;
-import com.open.trivia.dtos.QuizQuestionDto;
+import com.open.trivia.dtos.*;
 import com.open.trivia.service.feign.response.TriviaApiResponse;
 import com.open.trivia.service.feign.response.TriviaApiResponseItem;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static java.util.Map.entry;
 
 public class TestFixtures {
+
+    public static String QUIZ_ID = "TEST_QUIZ_ID";
+
     public static TriviaApiResponse TRIVIA_API_RESPONSE = new TriviaApiResponse(
             1,
             List.of(
@@ -37,10 +34,10 @@ public class TestFixtures {
                     ))
     );
 
-    public static List<PlayerAnswerDto> QUIZ_ANSWERS = List.of(
-            new PlayerAnswerDto(0, "House Majority Whip"),
-            new PlayerAnswerDto(1, "Toy Story 2"),
-            new PlayerAnswerDto(2, "Wrong Answer")
+    public static List<PlayerAnswerItem> PLAYER_ANSWERS = List.of(
+            new PlayerAnswerItem(0, "House Majority Whip"),
+            new PlayerAnswerItem(1, "Toy Story 2"),
+            new PlayerAnswerItem(2, "Wrong Answer")
     );
 
     public static List<QuizQuestionDto> QUIZ_QUESTION_DTOS = new ArrayList<>(List.of(
@@ -63,6 +60,11 @@ public class TestFixtures {
                     List.of("Colt 9mm", "Thompson", "MAC-10", "M3")
             )
     ));
+
+    public static QuizDto QUIZ = new QuizDto(
+            QUIZ_ID,
+            QUIZ_QUESTION_DTOS
+    );
 
     public static List<PlayerAnswerValidationResponse> PLAYER_ANSWERS_VALIDATION_RESPONSES = new ArrayList<>(List.of(
             new PlayerAnswerValidationResponse(
